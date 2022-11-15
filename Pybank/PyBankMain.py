@@ -1,61 +1,85 @@
-## TASK: Analyze the financial records of the company. 
 
-#------Import CVS file
-import os
+#----Importa Data
 import csv
+import os
+from datetime import datetime
+
 
 budget_data_path = os.path.join("PyBank","Resources","budget_data.csv")
 
-#------Read CSV file
-with open(budget_data_path,"r") as budget_data:
 
+#---- Open  & Read Data
+with open(budget_data_path,"r") as budget_data:
+  
     csvreader = csv.reader(budget_data, delimiter=',')
-    #print(csvreader)
+    print(csvreader)
 
     csv_header = next(csvreader)
+    
+#---- Create Variables
 
-    print(f"CSV Header: {csv_header}")
+    data = []
+    total_amount = 0
+    total_months = 0
+    changes = []
+    changes_dates = []
+    delta = 0
+    first_row = next(csvreader)  
+    total_months += 1
+    total_amount += int(first_row[1])
+    previous_value = int(first_row[1])
+
+ 
+#----For Loop to calculate months and amount  
+
     for row in csvreader:
-        print(row)
-
-#------Organizing the Data
-
-    
-#1. Calculate the total number of months included in the dataset
-#need count the months
-# date = [csvreader[0]]
-# months = dict(date)
-
-
-
-# print(f"Months {string.count(date)}")
-
-
-#2. Calculate the net total amount of "Profit/Losses" over the entire period
-#need sum everything at column"Profit/Losses"
-
-    def print_results (results):
-        months = str(results[0])
-        values = int(results[1])
-        total_months = (sum(values))
-        print(f"months {total_months}")
-    
+        
+        total_months += 1
+        total_amount += int(row[1])
+        current_value = int(row[1])
+        
+        delta=current_value-previous_value
+        
+       
+        previous_value = current_value
+        changes.append(delta)
+        changes_dates.append(row[0])
+        
 
 
+#---- summarize final results       
+change_monthly_avg = round(sum(changes)/len(changes),2)
+max_changes = max(changes) 
+min_changes = min(changes) 
 
-#3. Calculate the changes in "Profit/Losses" over the entire period, and then the average of those changes
-# need subtract the new month with the previous (with the whole period) and calculate the average from these differences
-
-
-
-#4. Calculate the greatest increase in profits (date and amount) over the entire period
-# need subtract the new month with the previous (with the whole period) and get the max
-
+max_changes_index = changes.index(max_changes)
+min_changes_index = changes.index(min_changes)
 
 
-#5. Calculate the greatest decrease in profits (date and amount) over the entire period
-# need subtract the new month with the previous (with the whole period) and get the min
+max_dates=changes_dates[max_changes_index]
+min_dates=changes_dates[min_changes_index]
+
+
+#----Print Results
+print("Financial Analysis")
+print("--------------------------------")
+print(f"Total Months: {total_months}")
+print(f"Total Amount: ${total_amount}")
+print(f"Average Change: ${change_monthly_avg}")
+print(f"Greatest Increase in Profits:  {max_dates}  (${max_changes})")
+print(f"Greatest Decrease in Profits: {min_dates} (${min_changes})")
 
 
 
-#6. Print the analysis to the terminal and export a text file with the results
+#----Output file in txt
+output_file = os.path.join("PyBank","Analysis","PyBank_results.txt")
+
+with open(output_file, "w") as datafile:
+    print("Financial Analysis", file=datafile)
+    print("--------------------------------", file=datafile)
+    print(f"Total Months: {total_months}", file=datafile)
+    print(f"Total Amount: ${total_amount}", file=datafile)
+    print(f"Average Change: ${change_monthly_avg}", file=datafile)
+    print(f"Greatest Increase in Profits: {max_dates} (${max_changes})", file=datafile)
+    print(f"Greatest Decrease in Profits: {min_dates} (${min_changes})", file=datafile)
+
